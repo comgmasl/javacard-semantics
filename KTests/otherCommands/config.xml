@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <include file="instructionFoundDataFieldGivenNoPin/config.xml" directory="." />
+  <include file="instructionFoundNoDataFieldGivenNoPIN/config.xml" directory="." />
+  <include file="instructionFoundNoDataFieldGivenPinRequiredNotGiven/config.xml" directory="." />
+  <include file="instructionNotFoundOnSelectedApplet/config.xml" directory="." />
+  <include file="noActiveAppletOnLogicalChannel/config.xml" directory="." />
+  <include file="pin/config.xml" directory="." />   
+  <include file="unopenedLogicalChannelNumber/config.xml" directory="." />
+  <include file="unsupportedLogicalChannelNumber/config.xml" directory="." />
+
+</tests>

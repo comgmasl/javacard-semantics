@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <test
+      definition="jcard.k"
+      programs="../../../../../programs/programsForTests/CloseChannelTests/pattern/multiselectableAppletActiveOnOtherChannels/"
+      results="."
+      extension="jcard" >
+      <all-programs>
+        <krun-option name="--pattern" value="&lt;tableApplets&gt; ... 1|->aid(ClassicApplet2,10000,2,&quot;active&quot;) ...&lt;/tableApplets&gt;"/>
+      </all-programs>
+  </test>
+
+</tests>

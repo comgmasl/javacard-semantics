@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <include file="matchedAIDCandidateActiveMultiselectableNoPreviousSelectedApplet/config.xml" directory="." />
+  <include file="matchedAIDCandidateActiveMultiselectablePreviousAppletActiveOnOtherChannels/config.xml" directory="." />
+  <include file="matchedAIDCandidateActiveMultiselectablePreviousAppletBecomesInactive/config.xml" directory="." />
+  <include file="matchedAIDCandidateActiveNotMultiselectable/config.xml" directory="." />
+  <include file="matchedAIDCandidateInactiveNoPreviousSelectedApplet/config.xml" directory="." />
+  <include file="matchedAIDCandidateInactivePreviousActiveOnOtherChannels/config.xml" directory="." />   
+  <include file="matchedAIDCandidateInactivePreviousAppletBecomesInactive/config.xml" directory="." />
+  <include file="unmatchedAIDActiveApplet/config.xml" directory="." />
+  <include file="unmatchedAIDNoActiveApplet/config.xml" directory="." />
+  <include file="unopenedChannel/config.xml" directory="." />
+
+</tests>

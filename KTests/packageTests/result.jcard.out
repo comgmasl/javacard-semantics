@@ -1,0 +1,89 @@
+********************************************************************* 
+*                           REMINDER                                *
+*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *
+*********************************************************************
+
+Inserting command: 
+CLA :
+INS :
+P1 :
+P2 :
+Lc (length of data) :
+Data field :
+
+Le (Expected response) :
+
+Response:SW1:90SW2:00
+
+********************************************************************* 
+*                           REMINDER                                *
+*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *
+*********************************************************************
+
+Inserting command: 
+CLA :
+INS :
+P1 :
+P2 :
+Lc (length of data) :
+
+Le (Expected response) :
+
+Response:SW1:90SW2:00
+
+********************************************************************* 
+*                           REMINDER                                *
+*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *
+*********************************************************************
+
+Inserting command: 
+CLA :
+INS :
+P1 :
+P2 :
+Lc (length of data) :
+
+Le (Expected response) :
+Result of the action is : 5
+
+
+
+Response:SW1:90SW2:00
+
+********************************************************************* 
+*                           REMINDER                                *
+*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *
+*********************************************************************
+
+Inserting command: 
+CLA :
+INS :
+P1 :
+P2 :
+Lc (length of data) :
+
+Le (Expected response) :
+Result of the action is : 1
+
+
+
+Response:SW1:90SW2:00
+
+********************************************************************* 
+*                           REMINDER                                *
+*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *
+*********************************************************************
+
+Inserting command: 
+CLA :
+INS :
+P1 :
+P2 :
+Lc (length of data) :
+
+Le (Expected response) :
+Result of the action is : 2
+
+
+
+Response:SW1:90SW2:00

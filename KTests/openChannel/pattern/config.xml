@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <include file="openFromBasicNoDefaultApplet/config.xml" directory="." />
+  <include file="openFromBasicWithAppletActiveNotMultiselectable/config.xml" directory="." />
+  <include file="openFromBasicWithDefaultAppletActiveMultiSelectable/config.xml" directory="." />
+  <include file="openFromBasicWithDefaultAppletInactive/config.xml" directory="." />
+  <include file="openFromRandomNoSelectedApplet/config.xml" directory="." />
+  <include file="openFromRandomSelectedMultiselectableApplet/config.xml" directory="." />
+  <include file="openFromRandomSelectedNotMultiselectableApplet/config.xml" directory="." />
+
+
+</tests>

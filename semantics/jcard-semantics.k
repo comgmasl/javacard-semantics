@@ -1,0 +1,52 @@
+require "package-semantics.k"
+require "class-declaration-semantics.k"
+require "new-semantics.k"
+require "self-reference-semantics.k"
+require "object-member-access-semantics.k"
+require "method-invocation-semantics.k"
+require "instance-of-semantics.k"
+require "cast-semantics.k"
+require "lookupmember-semantics.k"
+require "assignment-semantics.k"
+require "typeof-semantics.k"
+require "subtype-checking-semantics.k"
+require "unsafe-casting-semantics.k"
+require "generic-guard-semantics.k"
+require "typed-exception-semantics.k"
+require "return-semantics.k"
+require "program-initialization-semantics.k"
+require "method-application-semantics.k"
+require "exp-semantics.k"
+require "statement-semantics.k"
+require "auxiliary-operations-semantics.k"
+require "isoexception-semantics.k"
+require "compileTime/compile-semantics.k"
+require "runTime/runtime-semantics.k"
+
+module JCARD-SEMANTICS
+	imports PACKAGE-SEMANTICS
+	imports CLASS-DECLARATION-SEMANTICS
+	imports NEW-SEMANTICS
+	imports SELF-REFERENCE-SEMANTICS
+	imports OBJECT-MEMBER-ACCESS-SEMANTICS
+	imports METHOD-INVOCATION-SEMANTICS
+	imports INSTANCE-OF-SEMANTICS
+	imports CAST-SEMANTICS
+	imports LOOKUPMEMBER-SEMANTICS
+	imports ASSIGNMENT-SEMANTICS
+	imports TYPEOF-SEMANTICS
+	imports SUBTYPE-CHECKING-SEMANTICS
+	imports UNSAFE-CASTING-SEMANTICS
+	imports GENERIC-GUARD-SEMANTICS
+	imports TYPED-EXCEPTION-SEMANTICS
+	imports RETURN-SEMANTICS
+	imports PROGRAM-INITIALIZATION-SEMANTICS
+	imports METHOD-APPLICATION-SEMANTICS
+	imports EXP-SEMANTICS
+	imports STATEMENT-SEMANTICS
+	imports AUXILIARY-OPERATIONS-SEMANTICS
+	imports ISOEXCEPTION-SEMANTICS
+	imports COMPILE-SEMANTICS
+	imports RUNTIME-SEMANTICS
+
+endmodule

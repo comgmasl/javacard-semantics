@@ -1,0 +1,106 @@
+public class OwnerPIN
+{
+  private static final byte VALIDATED = 0;
+  private static final byte NUMFLAGS = 1;
+  private byte tryLimit;
+  private byte maxPINSize;
+  private byte[] pinValue;
+  private byte pinSize;
+  private boolean[] flags;
+  private byte[] triesLeft;
+
+  public OwnerPIN(byte tryLimit, byte maxPINSize)
+  {
+    if ((tryLimit < 1) || (maxPINSize < 1)) {
+      PINException.throwIt((short)1);
+    }
+    this.pinValue = new byte[maxPINSize];
+    this.pinSize = maxPINSize;
+    this.maxPINSize = maxPINSize;
+    this.tryLimit = tryLimit;
+    this.triesLeft = new byte[1];
+    resetTriesRemaining();
+    this.flags = new boolean[1];
+    setValidatedFlag(false);
+    for(int i = 0; i < maxPINSize; i++)
+      this.pinValue[i] = i;
+  }
+
+  protected boolean getValidatedFlag()
+  {
+    return this.flags[0];
+  }
+
+  protected void setValidatedFlag(boolean value)
+  {
+    this.flags[0] = value;
+  }
+
+  private void resetTriesRemaining()
+  {
+    this.triesLeft[0] = this.tryLimit;
+  }
+
+  private void decrementTriesRemaining()
+  {
+    this.triesLeft[0] = this.triesLeft[0] - 1;
+  }
+
+  public byte getTriesRemaining()
+  {
+    return this.triesLeft[0];
+  }
+
+  public boolean check(byte[] pin, short offset, byte length)
+  {
+    boolean noMoreTries = false;
+    setValidatedFlag(false);
+    if (getTriesRemaining() == 0)
+      noMoreTries = true;
+    else {
+      decrementTriesRemaining();
+    }
+    if (length > 0) {
+      byte tester = pin[((short)(offset + length - 1))];
+      if ((length != this.pinSize) || (noMoreTries)) {
+        return false;
+      }
+    }
+    for(int i = 0; i < length; i++){
+      if(pin[offset+i] != this.pinValue[i])
+        return false;
+    }
+    setValidatedFlag(true);
+    resetTriesRemaining();
+    return true;
+    
+  }
+
+  public boolean isValidated()
+  {
+    return getValidatedFlag();
+  }
+
+  public void reset()
+  {
+    if (isValidated())
+      resetAndUnblock();
+  }
+
+  public void update(byte[] pin, short offset, byte length)
+  {
+    if (length > this.maxPINSize) {
+      PINException.throwIt((short)1);
+    }
+    
+    this.pinSize = length;
+    this.triesLeft[0] = this.tryLimit;
+    setValidatedFlag(false);
+  }
+
+  public void resetAndUnblock()
+  {
+    resetTriesRemaining();
+    setValidatedFlag(false);
+  }
+}

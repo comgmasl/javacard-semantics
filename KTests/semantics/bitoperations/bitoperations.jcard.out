@@ -1,0 +1,20 @@
+********************************************************************* 
+*                           REMINDER                                *
+*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *
+*********************************************************************
+
+Inserting command: 
+CLA :
+INS :
+P1 :
+P2 :
+Lc (length of data) :
+
+Le (Expected response) :Right shift 1
+Left shift 16
+And 0
+Or 6
+Xor  6
+
+
+Response:SW1:90SW2:00

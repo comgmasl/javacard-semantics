@@ -1,0 +1,29 @@
+public class APDU extends Object
+{
+	public byte[] buffer = new byte[132];
+
+	public byte[] getBuffer()
+	{		
+		return buffer;
+	}
+	
+	public byte setIncomingAndReceive()
+	{
+		
+		return buffer[4];
+	}
+	
+	public void setOutgoingAndSend(byte bOff,byte len)
+	{
+		print("\n");
+		print("Result of the action is : " );
+		for (byte i = 0 ; i < len ; ++i){
+			print(buffer[bOff+i]);
+		}
+		print("\n");
+		print("\n");
+	}
+	
+	private APDU(){}
+	
+}

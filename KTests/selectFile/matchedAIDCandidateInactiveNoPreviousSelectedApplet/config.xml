@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <test
+      definition="jcard.k"
+      programs="../../../programs/programsForTests/selectFileTests/matchedAIDCandidateInactiveNoPreviousSelectedApplet/"
+      results="."
+      extension="jcard" >
+      <all-programs>
+        <krun-option name="--pattern" value="&lt;logicalChannels&gt; ... &lt;logicalChannel&gt;&lt;channelNumber&gt;1&lt;/channelNumber&gt;&lt;state&gt; &quot;open&quot;&lt;/state&gt;&lt;selectedApplet&gt; 0 &lt;/selectedApplet&gt;&lt;/logicalChannel&gt;&lt;/logicalChannels&gt;"/>
+      </all-programs>
+  </test>
+
+</tests>

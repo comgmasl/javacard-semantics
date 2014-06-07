@@ -1,0 +1,289 @@
+package classicapplet2;
+import javacard.framework.*;
+
+class SuperClass 
+{
+  public static void test(){
+    print("Testing");
+  }
+}
+
+class StaticClassForTest extends SuperClass
+{
+  public void nonStaticFunction(){
+      print("Non static function of StaticClassForTest");
+  }
+
+  public static void staticFunction(){
+      print("Static function of StaticClassForTest");
+      test();
+  }
+}
+
+class ClassicApplet2 extends Applet implements MultiSelectable {
+ 
+  final static byte Classic_CLA =(byte)0x88;
+  final static byte Deposit = (byte) 0x10;
+  final static byte Debit = (byte) 0x20;
+  final static byte Balance = (byte) 0x30;
+  final static byte TEST_STATIC = (byte) 0x40;
+    
+  final static byte SW_NEGATIVE_BALANCE = (byte) 0x6910;
+      
+  byte balance = 100;
+   
+  public static void install(byte[] bArray,byte bOffset,byte bLength) {
+    new ClassicApplet2();
+  }
+    
+  protected ClassicApplet2() {
+    register();
+  }
+
+  public void process(APDU apdu1) {
+    byte[] buffers = apdu1.getBuffer();
+    switch (buffers[ISO7816.OFFSET_INS]) {
+      case Balance :   getBalance(apdu1); break;
+      case Debit:   debit(apdu1); break;
+      case Deposit:   deposit(apdu1); break;
+      case TEST_STATIC: testStatic(apdu1); break; 
+      default:   ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+    }
+  }
+    
+  private void deposit(APDU apdu1) {
+    byte[] buffer = apdu1.getBuffer();
+    byte numints = (byte)buffer[ISO7816.OFFSET_LC];
+    byte intRead = (byte)apdu1.setIncomingAndReceive();
+    if (intRead != 1)
+          ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+
+    balance = (byte)
+          balance + buffer[ISO7816.OFFSET_CDATA];
+
+    return;
+
+    }      
+     
+  private void debit(APDU apdu1) {
+    byte[] buffer = apdu1.getBuffer();
+                 
+    byte numints = (byte)buffer[ISO7816.OFFSET_LC];
+    byte intRead = (byte)apdu1.setIncomingAndReceive();
+
+    if (intRead != 1)
+      ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+    if ( ( balance - buffer[ISO7816.OFFSET_CDATA]) < 0 )
+          ISOException.throwIt(SW_NEGATIVE_BALANCE);
+    balance = (byte)
+            balance - buffer[ISO7816.OFFSET_CDATA];
+    return;
+  } 
+     
+  private void getBalance(APDU apdu1) {
+    byte[] buf = apdu1.getBuffer();
+    buf[0] = (byte) balance;
+    apdu1.setOutgoingAndSend((short)0, (short)1);
+  }
+
+  private void testStatic(APDU apdu1){
+    StaticClassForTest.staticFunction();
+  }
+}
+
+
+
+public class APDU extends Object
+{
+  public byte[] buffer = new byte[132];
+
+  public byte[] getBuffer()
+  {   
+    return buffer;
+  }
+  
+  public byte setIncomingAndReceive()
+  {
+    
+    return buffer[4];
+  }
+  
+  public void setOutgoingAndSend(byte bOff,byte len)
+  {
+    print("\n");
+    print("Result of the action is : " );
+    for (byte i = 0 ; i < len ; ++i){
+      print(buffer[bOff+i]);
+    }
+    print("\n");
+    print("\n");
+  }
+  
+  private APDU(){}  
+}
+
+
+class Main
+{
+  
+  byte command;  
+  byte selectedApplet;
+  byte selectedOption;
+  byte sumInserted;
+  APDU data = new APDU();
+    
+  public Main()
+  { 
+
+      initDefaultApplets();
+      for(int i = 0; i < 1; i++){
+
+        print("\n");
+        print("\n");
+
+        print("********************************************************************* \n");
+        print("*                           REMINDER                                *\n");
+        print("*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *\n");
+        print("*********************************************************************");
+
+        print("\n");
+        print("\n");
+      
+        print("Inserting command: \n");
+        print("CLA :");
+        data.buffer[0] = receiveCommand(); 
+        print("\n");
+        print("INS :");  
+        data.buffer[1] = receiveCommand();
+        print("\n");
+        print("P1 :");
+        data.buffer[2] = receiveCommand();  
+        print("\n");
+        print("P2 :");
+        data.buffer[3] = receiveCommand(); 
+        print("\n");
+        print("Lc (length of data) :");
+        data.buffer[4] = receiveCommand(); 
+        print("\n");
+        int bytesReceived = 0;
+        while (bytesReceived < data.buffer[4]){
+          print("Data field :");
+          data.buffer[5+bytesReceived] = receiveCommand(); 
+          print("\n");
+          ++bytesReceived;
+        }         
+        print("\n");
+        print("Le (Expected response) :");
+        data.buffer[5+bytesReceived] = receiveCommand();
+        sendCommand();
+
+      }
+  }
+
+  public void initDefaultApplets(){
+    'assignDefaultAppletForChannel[0,0];
+    'openBasicLogicalChannel
+  }  
+}
+
+public class Applet extends Object
+{
+  protected Applet(){}
+  public static void install(byte[] bArray,
+                           byte bOffset,byte bLength){}
+  
+  public abstract void process(APDU apdu1);
+  public boolean select(){return true;}
+  public void deselect(){}
+  public void getShareableInterfaceObject(byte clientAID,byte parameter){}
+  protected void register() {}
+  protected void register(byte[] bArray,byte bOffset,byte bLength){}
+  protected boolean selectingAplet(){return true;}
+}public class CardRuntimeException extends RuntimeException
+{
+  private byte[] theSw = new byte[2];
+
+  public CardRuntimeException(short reason)
+  {
+      theSw[0] = (byte) reason;
+  }
+
+  public short getReason()
+  {
+      return (short) theSw[0];
+  }
+
+  public void setReason(short reason)
+  {
+  }
+
+  public static void throwIt(short reason)
+    throws CardRuntimeException
+  {
+
+  }
+}
+
+public class ISOException extends CardRuntimeException
+{
+  public ISOException(short sw)
+  {
+    super(sw);
+  }
+
+  public static void throwIt(short sw)
+    throws ISOException
+  {
+    throw new ISOException(sw);
+  }
+}
+
+public class RuntimeException extends Exception
+{
+  public RuntimeException(){}
+}
+
+public class Exception extends Throwable
+{
+  public Exception(){}
+}
+
+public class Throwable extends Object implements Serializable
+{
+  public Throwable(){}
+}
+public class ISO7816 
+{
+  public static final short SW_NO_ERROR = -28672;
+  public static final short SW_BYTES_REMAINING_00 = 24832;
+  public static final short SW_WRONG_LENGTH = 26368;
+  public static final short SW_SECURITY_STATUS_NOT_SATISFIED = 27010;
+  public static final short SW_FILE_INVALID = 27011;
+  public static final short SW_DATA_INVALID = 27012;
+  public static final short SW_CONDITIONS_NOT_SATISFIED = 27013;
+  public static final short SW_COMMAND_NOT_ALLOWED = 27014;
+  public static final short SW_APPLET_SELECT_FAILED = 27033;
+  public static final short SW_WRONG_DATA = 27264;
+  public static final short SW_FUNC_NOT_SUPPORTED = 27265;
+  public static final short SW_FILE_NOT_FOUND = 27266;
+  public static final short SW_RECORD_NOT_FOUND = 27267;
+  public static final short SW_INCORRECT_P1P2 = 27270;
+  public static final short SW_WRONG_P1P2 = 27392;
+  public static final short SW_CORRECT_LENGTH_00 = 27648;
+  public static final short SW_INS_NOT_SUPPORTED = 27904;
+  public static final short SW_CLA_NOT_SUPPORTED = 28160;
+  public static final short SW_UNKNOWN = 28416;
+  public static final short SW_FILE_FULL = 27268;
+  public static final short SW_LOGICAL_CHANNEL_NOT_SUPPORTED = 26753;
+  public static final short SW_SECURE_MESSAGING_NOT_SUPPORTED = 26754;
+  public static final short SW_WARNING_STATE_UNCHANGED = 25088;
+  public static final byte OFFSET_CLA = 0;
+  public static final byte OFFSET_INS = 1;
+  public static final byte OFFSET_P1 = 2;
+  public static final byte OFFSET_P2 = 3;
+  public static final byte OFFSET_LC = 4;
+  public static final byte OFFSET_CDATA = 5;
+  public static final byte CLA_ISO7816 = 0;
+  public static final byte INS_SELECT = -92;
+  public static final byte INS_EXTERNAL_AUTHENTICATE = -126;
+}

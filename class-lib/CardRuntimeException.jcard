@@ -1,0 +1,24 @@
+public class CardRuntimeException extends RuntimeException
+{
+  private byte[] theSw = new byte[2];
+
+  public CardRuntimeException(short reason)
+  {
+      theSw[0] = (byte) reason;
+  }
+
+  public short getReason()
+  {
+      return theSw[0];
+  }
+
+  public void setReason(short reason)
+  {
+  }
+
+  public static void throwIt(short reason)
+    throws CardRuntimeException
+  {
+
+  }
+}

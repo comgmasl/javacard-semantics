@@ -1,0 +1,495 @@
+package classicapplet2;
+import javacard.framework.*;
+
+
+
+class Wallet extends Applet{
+
+    final static byte Wallet_CLA =(byte)0xB1;
+    final static byte VERIFY = (byte) 0x20;
+    final static byte CREDIT = (byte) 0x30;
+    final static byte DEBIT = (byte) 0x40;
+    final static byte GET_BALANCE = (byte) 0x50;
+    final static byte MAX_BALANCE = (byte)0x7777;
+    final static byte MAX_TRANSACTION_AMOUNT = 127;
+    final static byte PIN_TRY_LIMIT =(byte)0x03;
+    final static byte MAX_PIN_SIZE =(byte)0x04;
+    final static byte SW_VERIFICATION_FAILED = (byte)0x6300;
+    final static byte SW_PIN_VERIFICATION_REQUIRED = (byte)0x6301;
+    final static byte SW_INVALID_TRANSACTION_AMOUNT = (byte)0x6483;
+    final static byte SW_EXCEED_MAXIMUM_BALANCE = (byte)0x6484;
+    final static byte SW_NEGATIVE_BALANCE = (byte)0x6485;
+
+    OwnerPIN pin;
+    int balance = 100;
+ 
+
+    private Wallet(){
+        pin = new OwnerPIN(PIN_TRY_LIMIT, MAX_PIN_SIZE);
+        register();
+    }
+
+    public static void install(int[] bArray, int bOffset, int bLength) {
+        new Wallet();
+    }
+
+    public boolean select() {
+        if ( pin.getTriesRemaining() == 0 ) return false;
+        return true;
+    }
+
+    public void deselect() {
+        pin.reset();
+    }
+
+    public void process(APDU apdu1) {
+        byte[] buffer = apdu1.getBuffer();
+
+        switch (buffer[ISO7816.OFFSET_INS]) {
+            case GET_BALANCE: getBalance(apdu1);
+                break;
+            case DEBIT: debit(apdu1);
+                break;
+            case CREDIT: credit(apdu1);
+                break;
+            case VERIFY: verify(apdu1);
+                break;
+            default: ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+        }
+    }
+
+    private void credit(APDU apdu1) {
+
+        byte[] buffer = apdu1.getBuffer();
+        int numints = buffer[ISO7816.OFFSET_LC];
+        int intRead = (int)apdu1.setIncomingAndReceive();
+        if (intRead != 1) ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+        int creditAmount = buffer[ISO7816.OFFSET_CDATA];
+        if ( ( creditAmount > MAX_TRANSACTION_AMOUNT) || ( creditAmount < 0 ) )
+            ISOException.throwIt(SW_INVALID_TRANSACTION_AMOUNT);
+
+        if ( ( balance + creditAmount) > MAX_BALANCE ) ISOException.throwIt(SW_EXCEED_MAXIMUM_BALANCE);
+
+        balance = (int)balance + creditAmount;
+
+    }
+
+    private void debit(APDU apdu1) {
+        byte[] buffer = apdu1.getBuffer();
+        int numints = (int)buffer[ISO7816.OFFSET_LC];
+        int intRead = (int)apdu1.setIncomingAndReceive();
+
+        if (intRead != 0) ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+
+        int debitAmount = buffer[ISO7816.OFFSET_CDATA];
+
+        if ( ( debitAmount > MAX_TRANSACTION_AMOUNT) || (debitAmount < 0 ) )
+            ISOException.throwIt(SW_INVALID_TRANSACTION_AMOUNT);
+
+        if ( ( balance - debitAmount) < 0 ) ISOException.throwIt(SW_NEGATIVE_BALANCE);
+
+        balance = (int) (balance - debitAmount);
+    }
+
+    private void getBalance(APDU apdu1) {
+         if ( !pin.isValidated() )
+            ISOException.throwIt(1670);
+        byte[] buffer = apdu1.getBuffer();
+
+        buffer[0] = (byte) balance;
+        apdu1.setOutgoingAndSend((short)0, (short)1);
+    }
+
+    private void verify(APDU apdu1) {
+        byte[] bufferDece = apdu1.getBuffer();
+        byte intRead = (byte)apdu1.setIncomingAndReceive();
+        if( pin.check(bufferDece, ISO7816.OFFSET_CDATA, intRead) == false)
+        {
+            ISOException.throwIt(SW_VERIFICATION_FAILED);
+        }
+
+    }
+}
+  
+
+
+class ClassicApplet2 extends Applet implements MultiSelectable, Altceva {
+ 
+  final static byte Classic_CLA =(byte)0x88;
+  final static byte Deposit = (byte) 0x10;
+  final static byte Debit = (byte) 0x20;
+  final static byte Balance = (byte) 0x30;
+    
+	final static byte SW_NEGATIVE_BALANCE = (byte) 0x6910;
+      
+  byte balance = 100;
+   
+  public static void install(byte[] bArray,byte bOffset,byte bLength) {
+    new ClassicApplet2();
+  }
+    
+  protected ClassicApplet2() {
+    register();
+  }
+
+  public void process(APDU apdu1) {
+    byte[] buffers = apdu1.getBuffer();
+    switch (buffers[ISO7816.OFFSET_INS]) {
+      case Balance :   getBalance(apdu1); break;
+      case Debit:   debit(apdu1); break;
+      case Deposit:   deposit(apdu1); break;
+      default:   ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
+    }
+  }
+    
+  private void deposit(APDU apdu1) {
+    byte[] buffer = apdu1.getBuffer();
+    byte numints = (byte)buffer[ISO7816.OFFSET_LC];
+    byte intRead = (byte)apdu1.setIncomingAndReceive();
+    if (intRead != 1)
+          ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+
+    balance = (byte)
+          balance + buffer[ISO7816.OFFSET_CDATA];
+
+    return;
+
+    } 
+     
+     
+  private void debit(APDU apdu1) {
+    byte[] buffer = apdu1.getBuffer();
+                 
+    byte numints = (byte)buffer[ISO7816.OFFSET_LC];
+    byte intRead = (byte)apdu1.setIncomingAndReceive();
+
+    if (intRead != 1)
+      ISOException.throwIt(ISO7816.SW_WRONG_LENGTH);
+    if ( ( balance - buffer[ISO7816.OFFSET_CDATA]) < 0 )
+          ISOException.throwIt(SW_NEGATIVE_BALANCE);
+    balance = (byte)
+            balance - buffer[ISO7816.OFFSET_CDATA];
+    return;
+  } 
+     
+  private void getBalance(APDU apdu1) {
+    byte[] buf = apdu1.getBuffer();
+    buf[0] = (byte) balance;
+    apdu1.setOutgoingAndSend((short)0, (short)1);
+  }
+}
+
+
+
+public class APDU extends Object
+{
+	public byte[] buffer = new byte[132];
+
+	public byte[] getBuffer()
+	{		
+		return buffer;
+	}
+	
+	public byte setIncomingAndReceive()
+	{
+		
+		return buffer[4];
+	}
+	
+	public void setOutgoingAndSend(byte bOff,byte len)
+	{
+		print("\n");
+		print("Result of the action is : " );
+		for (byte i = 0 ; i < len ; ++i){
+			print(buffer[bOff+i]);
+		}
+		print("\n");
+		print("\n");
+	}
+	
+	private APDU(){}
+	
+}
+
+
+class Main
+{
+  
+  byte command;  
+  byte selectedApplet;
+  byte selectedOption;
+  byte sumInserted;
+  APDU data = new APDU();
+  
+ 
+  
+  public Main()
+  { 
+
+      initDefaultApplets();
+      for(int i = 0; i < 3; i++){
+
+        print("\n");
+        print("\n");
+
+        print("********************************************************************* \n");
+        print("*                           REMINDER                                *\n");
+        print("*      APDU COMMAND FORMAT: CLA INS P1 P2 Lc DataField Le           *\n");
+        print("*********************************************************************");
+
+        print("\n");
+        print("\n");
+      
+        print("Inserting command: \n");
+        print("CLA :");
+        data.buffer[0] = receiveCommand(); 
+        print("\n");
+        print("INS :");  
+        data.buffer[1] = receiveCommand();
+        print("\n");
+        print("P1 :");
+        data.buffer[2] = receiveCommand();  
+        print("\n");
+        print("P2 :");
+        data.buffer[3] = receiveCommand(); 
+        print("\n");
+        print("Lc (length of data) :");
+        data.buffer[4] = receiveCommand(); 
+        print("\n");
+        int bytesReceived = 0;
+        while (bytesReceived < data.buffer[4]){
+          print("Data field :");
+          data.buffer[5+bytesReceived] = receiveCommand(); 
+          print("\n");
+          ++bytesReceived;
+        }         
+        print("\n");
+        print("Le (Expected response) :");
+        data.buffer[5+bytesReceived] = receiveCommand();
+        sendCommand();
+
+      }
+  }
+
+  public void initDefaultApplets(){
+  	'assignDefaultAppletForChannel[0,0];
+    'openBasicLogicalChannel
+  }
+
+
+  
+}
+  
+
+public class OwnerPIN
+{
+  private static final byte VALIDATED = 0;
+  private static final byte NUMFLAGS = 1;
+  private byte tryLimit;
+  private byte maxPINSize;
+  private byte[] pinValue;
+  private byte pinSize;
+  private boolean[] flags;
+  private byte[] triesLeft;
+
+  public OwnerPIN(byte tryLimit, byte maxPINSize)
+  {
+    if ((tryLimit < 1) || (maxPINSize < 1)) {
+      PINException.throwIt((short)1);
+    }
+    this.pinValue = new byte[maxPINSize];
+    this.pinSize = maxPINSize;
+    this.maxPINSize = maxPINSize;
+    this.tryLimit = tryLimit;
+    this.triesLeft = new byte[1];
+    resetTriesRemaining();
+    this.flags = new boolean[1];
+    setValidatedFlag(false);
+    for(int i = 0; i < maxPINSize; i++)
+      this.pinValue[i] = i;
+  }
+
+  protected boolean getValidatedFlag()
+  {
+    return this.flags[0];
+  }
+
+  protected void setValidatedFlag(boolean value)
+  {
+    this.flags[0] = value;
+  }
+
+  private void resetTriesRemaining()
+  {
+    this.triesLeft[0] = this.tryLimit;
+  }
+
+  private void decrementTriesRemaining()
+  {
+    this.triesLeft[0] = this.triesLeft[0] - 1;
+  }
+
+  public byte getTriesRemaining()
+  {
+    return this.triesLeft[0];
+  }
+
+  public boolean check(byte[] pin, short offset, byte length)
+  {
+    boolean noMoreTries = false;
+    setValidatedFlag(false);
+    if (getTriesRemaining() == 0)
+      noMoreTries = true;
+    else {
+      decrementTriesRemaining();
+    }
+    if (length > 0) {
+      byte tester = pin[((short)(offset + length - 1))];
+      if ((length != this.pinSize) || (noMoreTries)) {
+        return false;
+      }
+    }
+    for(int i = 0; i < length; i++){
+      if(pin[offset+i] != this.pinValue[i])
+        return false;
+    }
+    setValidatedFlag(true);
+    resetTriesRemaining();
+    return true;
+    
+  }
+
+  public boolean isValidated()
+  {
+    return getValidatedFlag();
+  }
+
+  public void reset()
+  {
+    if (isValidated())
+      resetAndUnblock();
+  }
+
+  public void update(byte[] pin, short offset, byte length)
+  {
+    if (length > this.maxPINSize) {
+      PINException.throwIt((short)1);
+    }
+    
+    this.pinSize = length;
+    this.triesLeft[0] = this.tryLimit;
+    setValidatedFlag(false);
+  }
+
+  public void resetAndUnblock()
+  {
+    resetTriesRemaining();
+    setValidatedFlag(false);
+  }
+}
+
+
+
+
+
+public class Applet extends Object
+{
+	protected Applet(){}
+	public static void install(byte[] bArray,
+                           byte bOffset,byte bLength){}
+	
+	public abstract void process(APDU apdu1);
+	public boolean select(){return true;}
+	public void deselect(){}
+	public void getShareableInterfaceObject(byte clientAID,byte parameter){}
+	protected void register() {}
+	protected void register(byte[] bArray,byte bOffset,byte bLength){}
+	protected boolean selectingAplet(){return true;}
+}public class CardRuntimeException extends RuntimeException
+{
+  private byte[] theSw = new byte[2];
+
+  public CardRuntimeException(short reason)
+  {
+      theSw[0] = (byte) reason;
+  }
+
+  public short getReason()
+  {
+      return (short) theSw[0];
+  }
+
+  public void setReason(short reason)
+  {
+  }
+
+  public static void throwIt(short reason)
+    throws CardRuntimeException
+  {
+
+  }
+}
+
+public class ISOException extends CardRuntimeException
+{
+  public ISOException(short sw)
+  {
+    super(sw);
+  }
+
+  public static void throwIt(short sw)
+    throws ISOException
+  {
+    throw new ISOException(sw);
+  }
+}
+
+public class RuntimeException extends Exception
+{
+  public RuntimeException(){}
+}
+
+public class Exception extends Throwable
+{
+  public Exception(){}
+}
+
+public class Throwable extends Object implements Serializable
+{
+  public Throwable(){}
+}
+public class ISO7816 
+{
+  public static final short SW_NO_ERROR = -28672;
+  public static final short SW_BYTES_REMAINING_00 = 24832;
+  public static final short SW_WRONG_LENGTH = 26368;
+  public static final short SW_SECURITY_STATUS_NOT_SATISFIED = 27010;
+  public static final short SW_FILE_INVALID = 27011;
+  public static final short SW_DATA_INVALID = 27012;
+  public static final short SW_CONDITIONS_NOT_SATISFIED = 27013;
+  public static final short SW_COMMAND_NOT_ALLOWED = 27014;
+  public static final short SW_APPLET_SELECT_FAILED = 27033;
+  public static final short SW_WRONG_DATA = 27264;
+  public static final short SW_FUNC_NOT_SUPPORTED = 27265;
+  public static final short SW_FILE_NOT_FOUND = 27266;
+  public static final short SW_RECORD_NOT_FOUND = 27267;
+  public static final short SW_INCORRECT_P1P2 = 27270;
+  public static final short SW_WRONG_P1P2 = 27392;
+  public static final short SW_CORRECT_LENGTH_00 = 27648;
+  public static final short SW_INS_NOT_SUPPORTED = 27904;
+  public static final short SW_CLA_NOT_SUPPORTED = 28160;
+  public static final short SW_UNKNOWN = 28416;
+  public static final short SW_FILE_FULL = 27268;
+  public static final short SW_LOGICAL_CHANNEL_NOT_SUPPORTED = 26753;
+  public static final short SW_SECURE_MESSAGING_NOT_SUPPORTED = 26754;
+  public static final short SW_WARNING_STATE_UNCHANGED = 25088;
+  public static final byte OFFSET_CLA = 0;
+  public static final byte OFFSET_INS = 1;
+  public static final byte OFFSET_P1 = 2;
+  public static final byte OFFSET_P2 = 3;
+  public static final byte OFFSET_LC = 4;
+  public static final byte OFFSET_CDATA = 5;
+  public static final byte CLA_ISO7816 = 0;
+  public static final byte INS_SELECT = -92;
+  public static final byte INS_EXTERNAL_AUTHENTICATE = -126;
+}

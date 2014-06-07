@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <include file="exceptions/config.xml" directory="." />
+  <include file="nonstaticFunctions/config.xml" directory="." />
+  <include file="staticFunctions/config.xml" directory="." />
+  <include file="staticMembers/config.xml" directory="." />
+
+</tests>

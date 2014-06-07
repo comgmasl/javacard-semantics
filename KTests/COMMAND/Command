@@ -1,0 +1,1 @@
+ktest KTests/otherCommands/pin/appletDeselection/config.xml --skip "kompile pdf"

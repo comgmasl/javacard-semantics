@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2013-2014 K Team. All Rights Reserved. -->
+<tests>
+
+  <include file="closeChannel/config.xml" directory="." />
+  <include file="openChannel/config.xml" directory="." />
+  <include file="otherCommands/config.xml" directory="." />
+  <include file="selectFile/config.xml" directory="." />
+
+</tests>

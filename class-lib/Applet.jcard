@@ -1,0 +1,14 @@
+public class Applet extends Object
+{
+	protected Applet(){}
+	public static void install(byte[] bArray,
+                           byte bOffset,byte bLength){}
+	
+	public abstract void process(APDU apdu1);
+	public boolean select(){return true;}
+	public void deselect(){}
+	public void getShareableInterfaceObject(byte clientAID,byte parameter){}
+	protected void register() {}
+	protected void register(byte[] bArray,byte bOffset,byte bLength){}
+	protected boolean selectingAplet(){return true;}
+}
